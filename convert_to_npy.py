@@ -4,6 +4,7 @@ import os
 train_eeg1 = np.genfromtxt('data/import/train_eeg1.csv', delimiter=',', skip_header=1)
 train_eeg2 = np.genfromtxt('data/import/train_eeg1.csv', delimiter=',', skip_header=1)
 train_emg = np.genfromtxt('data/import/train_eeg1.csv', delimiter=',', skip_header=1)
+train_labels = np.genfromtxt('data/import/train_labels.csv', delimiter=',', skip_header=1)
 print("Imported everything.")
 
 data_shape = (64800, 4, 128)
@@ -11,6 +12,7 @@ data_shape = (64800, 4, 128)
 train_eeg1 = np.reshape(train_eeg1[:,1:], data_shape)
 train_eeg2 = np.reshape(train_eeg2[:,1:], data_shape)
 train_emg = np.reshape(train_emg[:,1:], data_shape)
+train_labels = train_labels[:,1:]
 print("Reshape it.")
 
 train_eeg1 = train_eeg1[..., np.newaxis]
@@ -24,11 +26,23 @@ train_data = np.split(train_data, 3, axis=0)
 data_sub1 = train_data[0]
 data_sub2 = train_data[1]
 data_sub3 = train_data[2]
+
+train_labels = np.split(train_labels, 3, axis=0)
+labels_sub1 = train_labels[0]
+labels_sub2 = train_labels[1]
+labels_sub3 = train_labels[2]
+
 print("Split it.")
 
 path = os.getcwd()
-np.save(path + 'data/numpy/data_sub1.npy', data_sub1)
-np.save(path + 'data/numpy/data_sub2.npy', data_sub2)
-np.save(path + 'data/numpy/data_sub3.npy', data_sub3)
+np.save(path + '/data/numpy/data_sub1.npy', data_sub1)
+np.save(path + '/data/numpy/data_sub2.npy', data_sub2)
+np.save(path + '/data/numpy/data_sub3.npy', data_sub3)
+
+np.save(path + '/data/numpy/labels_sub1.npy', labels_sub1)
+np.save(path + '/data/numpy/labels_sub2.npy', labels_sub2)
+np.save(path + '/data/numpy/labels_sub3.npy', labels_sub3)
 
 print('Exported everything')
+
+
