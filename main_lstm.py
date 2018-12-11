@@ -19,16 +19,17 @@ def build(_base_shape):
     eeg2_inputer = Input(shape=_base_shape, name='eeg2_input')
     emg_inputer = Input(shape=_base_shape, name='emg_input')
 
-    lstm_out1 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg1', stateful=False)(
+    lstm_out1 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg1',
+                     stateful=False, activation='relu')(
         eeg1_inputer)
-    lstm_out2 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg2', stateful=False)(
-        eeg2_inputer)
-    lstm_out3 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_emg', stateful=False)(
-        emg_inputer)
+    lstm_out2 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg2',
+                     stateful=False, activation='relu')(eeg2_inputer)
+    lstm_out3 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_emg',
+                     stateful=False, activation='relu')(emg_inputer)
 
     merged = concatenate([lstm_out1, lstm_out2, lstm_out3], axis=2, name='merger')
 
-    lstm_merged = LSTM(3, activation='softmax', recurrent_activation='hard_sigmoid', name='lstm_merged',
+    lstm_merged = LSTM(3, activation='sigmoid', recurrent_activation='hard_sigmoid', name='lstm_merged',
                        return_sequences=True, stateful=False)(merged)
 
     _model = Model(inputs=[eeg1_inputer, eeg2_inputer, emg_inputer], outputs=lstm_merged)  # type: Model

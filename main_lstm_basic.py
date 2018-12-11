@@ -14,7 +14,7 @@ from helpers.plotter import plot_confusion_matrix
 def build(_base_shape):
     inputer = Input(shape=_base_shape, name='input')
     lstm = LSTM(3, return_sequences=True, stateful=False, recurrent_activation='hard_sigmoid',
-                name='lstm_eeg1')(inputer)
+                name='lstm_eeg1', activation='sigmoid')(inputer)
 
     _model = Model(inputs=inputer, outputs=lstm)  # type: Model
     return _model
