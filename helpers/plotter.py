@@ -11,8 +11,10 @@ def plot_confusion_matrix(cm, classes,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    eps = 10**(-6)
+
     if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm = cm.astype('float') / (cm.sum(axis=1)[:, np.newaxis]+eps)
         print("Normalized confusion matrix")
     else:
         print('Confusion matrix, without normalization')
