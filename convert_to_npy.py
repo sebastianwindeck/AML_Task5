@@ -15,33 +15,20 @@ train_emg = np.reshape(train_emg[:,1:], data_shape)
 train_labels = train_labels[:,1:]
 print("Reshape it.")
 
-train_eeg1 = train_eeg1[..., np.newaxis]
-print(train_eeg1.shape)
-train_eeg2 = train_eeg2[..., np.newaxis]
-train_emg = train_emg[..., np.newaxis]
-print("Add axis.")
-
-train_data = np.concatenate((train_eeg1, train_eeg2, train_emg), axis=3)
-train_data = np.split(train_data, 3, axis=0)
-data_sub1 = train_data[0]
-data_sub2 = train_data[1]
-data_sub3 = train_data[2]
-
-train_labels = np.split(train_labels, 3, axis=0)
-labels_sub1 = train_labels[0]
-labels_sub2 = train_labels[1]
-labels_sub3 = train_labels[2]
-
-print("Split it.")
+train_eeg1 = np.reshape(np.mean(train_eeg1,axis=1),(3,-1,128))
+print("Train shape: ", train_eeg1.shape)
+train_eeg2 = np.reshape(np.mean(train_eeg2,axis=1),(3,-1,128))
+train_emg = np.reshape(np.mean(train_emg,axis=1),(3,-1,128))
+train_labels = np.reshape(train_labels, (3,-1))
+print("Reshape it.")
+print("Mean it.")
 
 path = os.getcwd()
-np.save(path + '/data/numpy/data_sub1.npy', data_sub1)
-np.save(path + '/data/numpy/data_sub2.npy', data_sub2)
-np.save(path + '/data/numpy/data_sub3.npy', data_sub3)
+np.save(path + '/data/numpy/data_eeg1.npy', train_eeg1)
+np.save(path + '/data/numpy/data_eeg2.npy', train_eeg2)
+np.save(path + '/data/numpy/data_emg.npy', train_emg)
 
-np.save(path + '/data/numpy/labels_sub1.npy', labels_sub1)
-np.save(path + '/data/numpy/labels_sub2.npy', labels_sub2)
-np.save(path + '/data/numpy/labels_sub3.npy', labels_sub3)
+np.save(path + '/data/numpy/labels.npy', train_labels)
 
 print('Exported everything')
 
