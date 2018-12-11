@@ -46,7 +46,7 @@ model.compile(loss='sparse_categorical_crossentropy',
 print(model.summary())
 
 
-labels = np.subtract(labels, 1)
+labels = np.subtract(lab, 1)
 print("Unique labels: ", np.unique(labels) )
 model.fit(data, labels, batch_size=16, epochs=10, verbose=1, callbacks=None, validation_split=0.2)
 
@@ -90,7 +90,7 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
 
 
-cnf_matrix = confusion_matrix(lab1, y_pred)
+cnf_matrix = confusion_matrix(lab, y_pred)
 np.set_printoptions(precision=2)
 
 # Plot non-normalized confusion matrix
