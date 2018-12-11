@@ -33,7 +33,6 @@ del train_eeg1
 del train_eeg2
 del train_emg
 
-
 test_eeg1 = np.genfromtxt('data/import/test_eeg1.csv', delimiter=',', skip_header=1)
 test_eeg2 = np.genfromtxt('data/import/test_eeg2.csv', delimiter=',', skip_header=1)
 test_emg = np.genfromtxt('data/import/test_emg.csv', delimiter=',', skip_header=1)

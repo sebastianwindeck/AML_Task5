@@ -11,9 +11,10 @@ from sklearn.metrics import confusion_matrix
 from helpers.plotter import plot_confusion_matrix
 
 
-def build(base_shape):
-    inputer = Input(shape=base_shape, name='input')
-    lstm = LSTM(3, return_sequences=True, stateful=False, recurrent_activation='hard_sigmoid', name='lstm_eeg1')(inputer)
+def build(_base_shape):
+    inputer = Input(shape=_base_shape, name='input')
+    lstm = LSTM(3, return_sequences=True, stateful=False, recurrent_activation='hard_sigmoid',
+                name='lstm_eeg1')(inputer)
 
     _model = Model(inputs=inputer, outputs=lstm)  # type: Model
     return _model
@@ -48,7 +49,8 @@ model.compile(loss='categorical_crossentropy',
               metrics=['categorical_accuracy'])
 
 print(model.summary())
-plot_model(model, to_file=os.getcwd() + '/data/' + str(time.strftime("%Y%m%d-%H%M%S")) + '_model.png', show_shapes=True, show_layer_names=True, rankdir='TB')
+plot_model(model, to_file=os.getcwd() + '/data/' + str(time.strftime("%Y%m%d-%H%M%S")) + '_model.png',
+           show_shapes=True, show_layer_names=True, rankdir='TB')
 
 
 model.fit(data, encoded_lab, batch_size=1, epochs=20, verbose=1,
