@@ -39,11 +39,11 @@ y = np.ravel(y)
 '''Create model'''
 
 clf1 = LogisticRegression(solver='lbfgs', multi_class='multinomial',
-                          random_state=1, verbose=10)
-clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=10)
+                          random_state=1, verbose=1)
+clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=1)
 clf3 = GaussianNB()
-clf4 = SVC(kernel='linear', class_weight='balanced', verbose=10, probability=True)
-clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=10, probability=True)
+clf4 = SVC(kernel='linear', class_weight='balanced', verbose=1, probability=True)
+clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=1, probability=True)
 
 #TODO: if function for voting soft
 eclf1 = VotingClassifier(estimators=[
