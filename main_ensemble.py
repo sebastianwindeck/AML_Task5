@@ -8,7 +8,6 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
-
 from helpers.io import outputter
 from helpers.preprocessing import movingaverage
 
@@ -41,7 +40,7 @@ y = np.ravel(y)
 
 clf1 = LogisticRegression(solver='lbfgs', multi_class='multinomial',
                           random_state=1, verbose=10)
-clf2 = RandomForestClassifier(n_estimators=200, random_state=1, verbose=10)
+clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=10)
 clf3 = GaussianNB()
 clf4 = SVC(kernel='linear', class_weight='balanced', verbose=10, probability=True)
 clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=10, probability=True)
@@ -56,6 +55,8 @@ print('Fitted.')
 
 y_pred = eclf1.predict(X_test)
 print('Predicted.')
+print('')
+print('--- Confusion matrix ---')
 confusion_matrix(y, y_pred)
 
 del eeg1
