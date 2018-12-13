@@ -4,7 +4,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.layers import Input
-from keras.layers import LSTM
+from keras.layers import LSTM, GRU
 from keras.layers import concatenate
 from keras.models import Model
 from keras.utils import plot_model, to_categorical
@@ -19,17 +19,17 @@ def build(_base_shape):
     eeg2_inputer = Input(shape=_base_shape, name='eeg2_input')
     emg_inputer = Input(shape=_base_shape, name='emg_input')
 
-    lstm_out1 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg1',
+    lstm_out1 = GRU(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg1',
                      stateful=False, activation='relu')(
         eeg1_inputer)
-    lstm_out2 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg2',
+    lstm_out2 = GRU(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_eeg2',
                      stateful=False, activation='relu')(eeg2_inputer)
-    lstm_out3 = LSTM(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_emg',
+    lstm_out3 = GRU(64, return_sequences=True, recurrent_activation='hard_sigmoid', name='lstm_emg',
                      stateful=False, activation='relu')(emg_inputer)
 
     merged = concatenate([lstm_out1, lstm_out2, lstm_out3], axis=2, name='merger')
 
-    lstm_merged = LSTM(3, activation='sigmoid', recurrent_activation='hard_sigmoid', name='lstm_merged',
+    lstm_merged = GRU(3, activation='sigmoid', recurrent_activation='hard_sigmoid', name='lstm_merged',
                        return_sequences=True, stateful=False)(merged)
 
     _model = Model(inputs=[eeg1_inputer, eeg2_inputer, emg_inputer], outputs=lstm_merged)  # type: Model
@@ -63,7 +63,7 @@ plot_model(model, to_file=os.getcwd() + '/data/' + str(time.strftime("%Y%m%d-%H%
            show_layer_names=True, rankdir='TB')
 
 print("Unique labels: ", np.unique(lab))
-model.fit({'eeg1_input': eeg1, 'eeg2_input': eeg2, 'emg_input': emg}, encoded_lab, batch_size=1, epochs=10, verbose=1,
+model.fit({'eeg1_input': eeg1, 'eeg2_input': eeg2, 'emg_input': emg}, encoded_lab, batch_size=1, epochs=50, verbose=1,
           callbacks=None)
 
 y_pred = model.predict({'eeg1_input': eeg1, 'eeg2_input': eeg2, 'emg_input': emg})
