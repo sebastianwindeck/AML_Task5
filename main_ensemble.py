@@ -2,16 +2,12 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.ensemble import VotingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
 from helpers.io import outputter
 from helpers.preprocessing import movingaverage
 from helpers.plotter import plot_confusion_matrix
 from joblib import load
+from mlxtend.classifier import EnsembleVoteClassifier
 
 eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
 eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
@@ -42,15 +38,17 @@ y = np.ravel(y)
 '''Hier müssen alle relevanten Classifier geladen werden'''
 
 clf1 = load(os.getcwd() + '/model/gnaive.joblib')
+clf2 = load(os.getcwd() + '/model/rfc500.joblib')
 
 #TODO: if function for voting soft
-eclf1 = VotingClassifier(estimators=[
-    ('lr', clf1)], voting='soft', n_jobs=-1, flatten_transform=False)
+
+evc = EnsembleVoteClassifier(clfs=[clf1, clf2], weights=[1,1], refit=False)
 
 '''Fit model'''
+evc.fit(X , y)
 print('Fitted.')
 
-y_pred = eclf1.predict(X_test)
+y_pred = evc.predict(X_test)
 print('Predicted.')
 print('')
 print('--- Confusion matrix ---')
@@ -77,7 +75,7 @@ del eeg2_t
 del emg_t
 print("Data format: ", data_t.shape)
 
-y_pred_t = eclf1.predict(data_t)
+y_pred_t = evc.predict(data_t)
 y_pred_t = np.reshape(y_pred_t, (-1, 4))
 # TODO: evtl modus plus prior if even
 y_pred_t = np.mean(y_pred_t, axis=1)
