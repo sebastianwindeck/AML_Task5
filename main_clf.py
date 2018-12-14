@@ -16,6 +16,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
+
 eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
 eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
 emg = np.load(os.getcwd() + '/data/numpy/data_emg.npy')
@@ -40,13 +41,12 @@ print("Label format: ", labels.shape)
 X = data
 y = labels
 
-
 '''Create model'''
 
 clf = SVC(kernel='rbf', C=1, gamma='auto')
 
 '''Feature selection'''
-f_select= SelectKBest(f_classif, k=200)
+f_select = SelectKBest(f_classif, k=200)
 
 '''pipe'''
 pipeline = Pipeline([
@@ -55,11 +55,11 @@ pipeline = Pipeline([
 ])
 
 '''parameters for Gsearch'''
-parameters ={
-    'f_select__k' : [150,250],
-    #'SVC__degree' : [2,5,8],
-    #höher -> 1000
-    'SVC__C' : [0.1, 1,10]
+parameters = {
+    'f_select__k': [150, 250],
+    # 'SVC__degree' : [2,5,8],
+    # höher -> 1000
+    'SVC__C': [0.1, 1, 10]
 }
 
 '''Gridsearch'''
@@ -81,8 +81,6 @@ print(y_pred)
 
 classes = np.unique(y)
 plot_confusion_matrix(classes, y_true=y, y_pred=y_pred)
-
-
 
 del eeg1
 del eeg2
@@ -114,6 +112,5 @@ smoothened = np.add(smoothened, 1)
 plt.plot(np.add(y_pred_t, 1), alpha=0.15)
 plt.plot(smoothened[:])
 plt.show()
-
 
 outputter(smoothened)
