@@ -39,12 +39,13 @@ y = np.ravel(y)
 '''Create model'''
 
 clf1 = LogisticRegression(solver='lbfgs', multi_class='multinomial',
-                          random_state=1, verbose=10)
-clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=10)
+                          random_state=1, verbose=1)
+clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=1)
 clf3 = GaussianNB()
-clf4 = SVC(kernel='linear', class_weight='balanced', verbose=10, probability=True)
-clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=10, probability=True)
+clf4 = SVC(kernel='linear', class_weight='balanced', verbose=1, probability=True)
+clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=1, probability=True)
 
+#TODO: if function for voting soft
 eclf1 = VotingClassifier(estimators=[
     ('lr', clf1), ('rf', clf2), ('gnb', clf3), ('l_svm', clf4), ('r_svm', clf5)], voting='hard', n_jobs=-1)
 
@@ -80,6 +81,7 @@ print("Data format: ", data_t.shape)
 
 y_pred_t = eclf1.predict(data_t)
 y_pred_t = np.reshape(y_pred_t, (-1, 4))
+# TODO: evtl modus plus prior if even
 y_pred_t = np.mean(y_pred_t, axis=1)
 
 
