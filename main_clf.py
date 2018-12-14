@@ -56,19 +56,8 @@ print(np.ravel(y_test))
 print(y_pred)
 
 classes = np.unique(y_test)
-cnf_matrix = confusion_matrix(y_true=np.ravel(y_test), y_pred=y_pred)
-np.set_printoptions(precision=2)
+plot_confusion_matrix(classes, y_true=y_test, y_pred=y_pred)
 
-plt.figure()
-plot_confusion_matrix(cnf_matrix, classes=classes,
-                      title='Confusion matrix, without normalization')
-
-# Plot normalized confusion matrix
-plt.figure()
-plot_confusion_matrix(cnf_matrix, classes=classes, normalize=True,
-                      title='Normalized confusion matrix')
-
-plt.show()
 
 
 del eeg1

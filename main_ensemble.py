@@ -10,6 +10,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from helpers.io import outputter
 from helpers.preprocessing import movingaverage
+from joblib import load
 
 eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
 eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
@@ -36,29 +37,24 @@ print("Label format: ", labels.shape)
 X, X_test, y, y_test = train_test_split(data, labels, test_size=0.2, random_state=0)
 y = np.ravel(y)
 
-'''Create model'''
+'''Load model'''
+'''Hier müssen alle relevanten Classifier geladen werden'''
+clf1 = load(os.getcwd() + '/model/gnaive.joblib')
 
-clf1 = LogisticRegression(solver='lbfgs', multi_class='multinomial',
-                          random_state=1, verbose=1)
-clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=1)
-clf3 = GaussianNB()
-clf4 = SVC(kernel='linear', class_weight='balanced', verbose=1, probability=True)
-clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=1, probability=True)
 
 #TODO: if function for voting soft
 eclf1 = VotingClassifier(estimators=[
-    ('lr', clf1), ('rf', clf2), ('gnb', clf3), ('l_svm', clf4), ('r_svm', clf5)], voting='hard', n_jobs=-1)
+    ('lr', clf1)], voting='soft', n_jobs=-1, flatten_transform=False)
 
 '''Fit model'''
-
-eclf1 = eclf1.fit(X, y)
 print('Fitted.')
 
 y_pred = eclf1.predict(X_test)
 print('Predicted.')
 print('')
 print('--- Confusion matrix ---')
-confusion_matrix(y, y_pred)
+
+
 
 del eeg1
 del eeg2
