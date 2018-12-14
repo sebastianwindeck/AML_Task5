@@ -4,6 +4,23 @@ import os
 import numpy as np
 
 
+def inputter_train():
+    eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
+    eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
+    emg = np.load(os.getcwd() + '/data/numpy/data_emg.npy')
+    lab = np.load(os.getcwd() + '/data/numpy/labels.npy')
+
+    return  eeg1, eeg2, emg, lab
+
+
+def inputter_test():
+    eeg1_t = np.load(os.getcwd() + '/data/numpy/test_eeg1.npy')
+    eeg2_t = np.load(os.getcwd() + '/data/numpy/test_eeg2.npy')
+    emg_t = np.load(os.getcwd() + '/data/numpy/test_emg.npy')
+
+    return eeg1_t,eeg2_t, emg_t
+
+
 def outputter(array):
     y = pd.DataFrame(array, dtype=np.dtype('U25'))
     ids = list(range(0, y.shape[0]))
