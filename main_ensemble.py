@@ -10,6 +10,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from helpers.io import outputter
 from helpers.preprocessing import movingaverage
+from helpers.plotter import plot_confusion_matrix
 from joblib import load
 
 eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
@@ -39,8 +40,8 @@ y = np.ravel(y)
 
 '''Load model'''
 '''Hier müssen alle relevanten Classifier geladen werden'''
-clf1 = load(os.getcwd() + '/model/gnaive.joblib')
 
+clf1 = load(os.getcwd() + '/model/gnaive.joblib')
 
 #TODO: if function for voting soft
 eclf1 = VotingClassifier(estimators=[
@@ -54,7 +55,8 @@ print('Predicted.')
 print('')
 print('--- Confusion matrix ---')
 
-
+classes = np.unique(y_test)
+plot_confusion_matrix(classes,y_true=y_test, y_pred=y_pred)
 
 del eeg1
 del eeg2
