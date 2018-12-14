@@ -12,7 +12,10 @@ from helpers.io import outputter
 from helpers.plotter import plot_confusion_matrix
 from helpers.preprocessing import movingaverage
 from joblib import dump
-
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import f_classif
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
 eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
 eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
 emg = np.load(os.getcwd() + '/data/numpy/data_emg.npy')
@@ -34,29 +37,50 @@ labels = np.subtract(labels, 1)
 print("Label format: ", labels.shape)
 
 '''Split data set'''
+X = data
+y = labels
 
-X, X_test, y, y_test = train_test_split(data, labels, test_size=0.2, random_state=0)
 
 '''Create model'''
 
-clf = SVC(kernel='rbf', C=1)
+clf = SVC(kernel='rbf', C=1, gamma='auto')
+
+'''Feature selection'''
+f_select= SelectKBest(f_classif, k=200)
+
+'''pipe'''
+pipeline = Pipeline([
+    ('f_select', f_select),
+    ('SVC', clf)
+])
+
+'''parameters for Gsearch'''
+parameters ={
+    'f_select__k' : [150,250],
+    #'SVC__degree' : [2,5,8],
+    #höher -> 1000
+    'SVC__C' : [0.1, 1,10]
+}
+
+'''Gridsearch'''
+CV = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy', n_jobs=-1, cv=8, verbose=2)
 
 '''Fit model'''
+clf = CV.fit(X, np.ravel(y))
 
-clf = clf.fit(X, np.ravel(y))
 dump(clf, os.getcwd() + '/model/rbf1.joblib')
 print('Fitted.')
 
-y_pred = clf.predict(X_test)
+y_pred = clf.predict(X)
 print(y_pred)
 print('Predicted.')
 print('')
 print('--- Confusion matrix ---')
-print(np.ravel(y_test))
+print(np.ravel(y))
 print(y_pred)
 
-classes = np.unique(y_test)
-plot_confusion_matrix(classes, y_true=y_test, y_pred=y_pred)
+classes = np.unique(y)
+plot_confusion_matrix(classes, y_true=y, y_pred=y_pred)
 
 
 
