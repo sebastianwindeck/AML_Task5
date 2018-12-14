@@ -65,17 +65,3 @@ plt.plot(y_pred)
 
 plt.show()
 
-cnf_matrix = confusion_matrix(np.reshape(lab, (21600,)), np.reshape(y_pred, (21600,)))
-np.set_printoptions(precision=2)
-
-# Plot non-normalized confusion matrix
-plt.figure()
-plot_confusion_matrix(cnf_matrix, classes=[0, 1, 2],
-                      title='Confusion matrix, without normalization')
-
-# Plot normalized confusion matrix
-plt.figure()
-plot_confusion_matrix(cnf_matrix, classes=[0, 1, 2], normalize=True,
-                      title='Normalized confusion matrix')
-
-plt.show()

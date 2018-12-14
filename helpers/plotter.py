@@ -1,9 +1,10 @@
 import numpy as np
 import itertools
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
 
-def plot_confusion_matrix(cm, classes,
+def _plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
@@ -38,3 +39,19 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
+
+    plt.show()
+
+def plot_confusion_matrix(classes, y_true, y_pred):
+
+    cnf_matrix = confusion_matrix(y_true=np.ravel(y_true), y_pred=y_pred)
+    np.set_printoptions(precision=2)
+
+    plt.figure()
+    _plot_confusion_matrix(cnf_matrix, classes=classes,
+                          title='Confusion matrix, without normalization')
+
+    # Plot normalized confusion matrix
+    plt.figure()
+    _plot_confusion_matrix(cnf_matrix, classes=classes, normalize=True,
+                          title='Normalized confusion matrix')
