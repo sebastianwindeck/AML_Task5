@@ -9,7 +9,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from helpers.io import outputter
+from helpers.plotter import plot_confusion_matrix
 from helpers.preprocessing import movingaverage
+from joblib import dump
 
 eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
 eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
@@ -34,30 +36,40 @@ print("Label format: ", labels.shape)
 '''Split data set'''
 
 X, X_test, y, y_test = train_test_split(data, labels, test_size=0.2, random_state=0)
-y = np.ravel(y)
 
 '''Create model'''
 
-clf1 = LogisticRegression(solver='lbfgs', multi_class='multinomial',
-                          random_state=1, verbose=10)
-clf2 = RandomForestClassifier(n_estimators=100, random_state=1, verbose=10)
-clf3 = GaussianNB()
-clf4 = SVC(kernel='linear', class_weight='balanced', verbose=10, probability=True)
-clf5 = SVC(kernel='rbf', class_weight='balanced', verbose=10, probability=True)
-
-eclf1 = VotingClassifier(estimators=[
-    ('lr', clf1), ('rf', clf2), ('gnb', clf3), ('l_svm', clf4), ('r_svm', clf5)], voting='hard', n_jobs=-1)
+clf = SVC(kernel='rbf', C=1)
 
 '''Fit model'''
 
-eclf1 = eclf1.fit(X, y)
+clf = clf.fit(X, np.ravel(y))
+dump(clf, os.getcwd() + '/model/rbf1.joblib')
 print('Fitted.')
 
-y_pred = eclf1.predict(X_test)
+y_pred = clf.predict(X_test)
+print(y_pred)
 print('Predicted.')
 print('')
 print('--- Confusion matrix ---')
-confusion_matrix(y, y_pred)
+print(np.ravel(y_test))
+print(y_pred)
+
+classes = np.unique(y_test)
+cnf_matrix = confusion_matrix(y_true=np.ravel(y_test), y_pred=y_pred)
+np.set_printoptions(precision=2)
+
+plt.figure()
+plot_confusion_matrix(cnf_matrix, classes=classes,
+                      title='Confusion matrix, without normalization')
+
+# Plot normalized confusion matrix
+plt.figure()
+plot_confusion_matrix(cnf_matrix, classes=classes, normalize=True,
+                      title='Normalized confusion matrix')
+
+plt.show()
+
 
 del eeg1
 del eeg2
@@ -71,17 +83,17 @@ emg_t = np.load(os.getcwd() + '/data/numpy/test_emg.npy')
 
 data_t = np.concatenate((np.reshape(eeg1_t, (-1, 128)),
                          np.reshape(eeg2_t, (-1, 128)),
-                         np.reshape(emg_t, (-1, 128))), axis=1)
-
+                         np.reshape(emg_t, (-1, 128))),
+                        axis=1)
 del eeg1_t
 del eeg2_t
 del emg_t
+
 print("Data format: ", data_t.shape)
 
-y_pred_t = eclf1.predict(data_t)
+y_pred_t = clf.predict(data_t)
 y_pred_t = np.reshape(y_pred_t, (-1, 4))
 y_pred_t = np.mean(y_pred_t, axis=1)
-
 
 smoothened = np.round(movingaverage(y_pred_t, 2))
 print(smoothened.shape)
