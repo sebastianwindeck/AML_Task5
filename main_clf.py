@@ -43,7 +43,7 @@ y = labels
 
 '''Create model'''
 
-clf = SVC(kernel='rbf', C=1)
+clf = SVC(kernel='rbf', C=1, gamma='auto')
 
 '''Feature selection'''
 f_select= SelectKBest(f_classif, k=200)
