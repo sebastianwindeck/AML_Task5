@@ -37,13 +37,13 @@ y = np.ravel(y)
 '''Load model'''
 '''Hier müssen alle relevanten Classifier geladen werden'''
 
-clf1 = load(os.getcwd() + '/model/gnaive.joblib')
+clf1 = load(os.getcwd() + '/model/gnb.joblib')
 clf2 = load(os.getcwd() + '/model/rfc500.joblib')
 
-evc = EnsembleVoteClassifier(clfs=[clf1, clf2], weights=[2,1], refit=False, voting='soft')
+evc = EnsembleVoteClassifier(clfs=[clf1, clf2], weights=[1, 1], refit=False, voting='soft')
 
 '''Fit model'''
-evc.fit(X , y)
+evc.fit(X, y)
 print('Fitted.')
 
 y_pred = evc.predict(X_test)
@@ -52,11 +52,11 @@ print('')
 print('--- Confusion matrix ---')
 
 classes = np.unique(y_test)
-plot_confusion_matrix(classes,y_true=y_test, y_pred=y_pred)
+plot_confusion_matrix(classes, y_true=y_test, y_pred=y_pred)
 
 '''Predict test set'''
 
-eeg1_t,eeg2_t, emg_t = inputter_test()
+eeg1_t, eeg2_t, emg_t = inputter_test()
 
 data_t = np.concatenate((np.reshape(eeg1_t, (-1, 128)),
                          np.reshape(eeg2_t, (-1, 128)),
