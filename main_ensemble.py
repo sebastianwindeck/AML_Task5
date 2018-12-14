@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from helpers.io import outputter, inputter_train, inputter_test
-from helpers.preprocessing import movingaverage
+from helpers.preprocessing import movingaverage, transform_proba
 from helpers.plotter import plot_confusion_matrix
 from joblib import load
 from mlxtend.classifier import EnsembleVoteClassifier
+from scipy.signal import savgol_filter
 
 eeg1, eeg2, emg, lab = inputter_train()
 
@@ -68,17 +69,22 @@ del emg_t
 print("Data format: ", data_t.shape)
 
 y_pred_t = evc.transform(data_t)
-y_pred_t = np.reshape(y_pred_t, (-1, 4))
-# TODO: evtl modus plus prior if even
-y_pred_t = np.mean(y_pred_t, axis=1)
+y_pred_t = transform_proba(y_pred=y_pred_t, exponential=False)
 
 
-smoothened = np.round(movingaverage(y_pred_t, 3))
+
+smoothened = np.reshape(y_pred_t,(2,-1))
+smoothened = np.round(smoothened)
 print(smoothened.shape)
-smoothened = np.add(smoothened, 1)
-plt.plot(np.add(y_pred_t, 1), alpha=0.15)
-plt.plot(smoothened[:])
+smoothened = savgol_filter(smoothened, polyorder=1, axis=1, window_length=13, mode='nearest')
+plt.plot(smoothened.T[:5000,1])
+smoothened = np.round(smoothened)
+print(smoothened.shape)
+#plt.plot(y_pred_t, alpha=0.15)
+plt.plot(smoothened.T[:5000,1])
 plt.show()
+
+smoothened = np.reshape(smoothened,(-1,1))
 
 
 outputter(smoothened)
