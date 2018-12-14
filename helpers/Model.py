@@ -9,9 +9,8 @@ def mnb (X,Y, test):
         #y_test = mnb.predict(test)
         y_pred[i, :, :] = mnb.predict_proba(X[:, i, :])
 
-     y_pred_total = np.sum(y_pred, axis=0)
-     y_pred_total = np.amax(y_pred,axis=1)
+    y_pred_total = np.sum(y_pred, axis=0)
+    y_pred_total = np.amax(y_pred,axis=1)
 
-    return: y_pred_total
-
+    return y_pred_total
 
