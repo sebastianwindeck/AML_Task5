@@ -6,12 +6,8 @@ from joblib import dump
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.model_selection import GridSearchCV
-from sklearn.neural_network import MLPClassifier
-from sklearn.pipeline import Pipeline
-
-from helpers.io import outputter, inputter_train
-from helpers.plotter import plot_confusion_matrix
-from helpers.preprocessing import movingaverage
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import balanced_accuracy_score
 
 eeg1, eeg2, emg, lab = inputter_train()
 
@@ -39,32 +35,38 @@ X = data
 y = labels
 
 '''Create model'''
-clf = MLPClassifier(solver='lbfgs', alpha=1e-3,
-                    hidden_layer_sizes=(500, 3), random_state=1)
+
+clf = RandomForestClassifier(n_estimators=100, max_depth=2,
+                             random_state=0)
 '''Feature selection'''
-f_select = SelectKBest(f_classif, k=200)
+#f_select = SelectKBest(f_classif, k=200)
 
 '''pipe'''
 pipeline = Pipeline([
-    ('f_select', f_select),
-    ('GNB', clf)
+    #('f_select', f_select),
+    ('RF', clf)
 ])
 
 '''parameters for Gsearch'''
 parameters = {
-    'f_select__k': [100],
+    #'f_select__k': [150, 250],
     # 'SVC__degree' : [2,5,8],
     # höher -> 1000
-    # 'SVC__C': [0.1, 1, 10]
+    'RF__max_depth': [2],
+    'RF__n_estimators':[3000]
 }
+
 
 '''Gridsearch'''
 CV = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy', n_jobs=1, cv=8, verbose=2)
 
 '''Fit model'''
-clf.fit(X, np.ravel(y))
-# clf = CV.best_estimator_
-dump(clf, os.getcwd() + '/model/ann200.joblib')
+clf = CV.fit(X, np.ravel(y))
+
+print(clf.best_score_)
+print(clf.best_params_)
+
+dump(clf, os.getcwd() + '/model/rf3.joblib')
 print('Fitted.')
 
 y_pred = clf.predict(X)
