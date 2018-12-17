@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from helpers.io import outputter, inputter_train, inputter_test
-from helpers.preprocessing import movingaverage, transform_proba
+from helpers.preprocessing import transform_proba
 from helpers.plotter import plot_confusion_matrix
 from joblib import load
 from mlxtend.classifier import EnsembleVoteClassifier
@@ -39,9 +39,11 @@ y = np.ravel(y)
 '''Hier müssen alle relevanten Classifier geladen werden'''
 
 clf1 = load(os.getcwd() + '/model/gnb.joblib')
-clf2 = load(os.getcwd() + '/model/rfc500.joblib')
+clf2 = load(os.getcwd() + '/model/rfc750.joblib')
+clf3 = load(os.getcwd() + '/model/ann.joblib')
 
-evc = EnsembleVoteClassifier(clfs=[clf1, clf2], weights=[1, 1], refit=False, voting='soft')
+evc = EnsembleVoteClassifier(clfs=[clf1, clf2, clf3], weights=[2, 3, 4
+                                                               ], refit=False, voting='soft')
 
 '''Fit model'''
 evc.fit(X, y)
@@ -69,22 +71,19 @@ del emg_t
 print("Data format: ", data_t.shape)
 
 y_pred_t = evc.transform(data_t)
-y_pred_t = transform_proba(y_pred=y_pred_t, exponential=False)
+del data_t
+y_pred_t = transform_proba(y_pred=y_pred_t, exponential=True)
 
-
-
-smoothened = np.reshape(y_pred_t,(2,-1))
+smoothened = np.reshape(y_pred_t, (2, -1))
 smoothened = np.round(smoothened)
 print(smoothened.shape)
-smoothened = savgol_filter(smoothened, polyorder=1, axis=1, window_length=13, mode='nearest')
-plt.plot(smoothened.T[:5000,1])
+smoothened = savgol_filter(smoothened, polyorder=2, axis=1, window_length=9, mode='nearest')
+plt.plot(smoothened.T[:5000, 1])
 smoothened = np.round(smoothened)
 print(smoothened.shape)
-#plt.plot(y_pred_t, alpha=0.15)
-plt.plot(smoothened.T[:5000,1])
+# plt.plot(y_pred_t, alpha=0.15)
+plt.plot(smoothened.T[:5000, 1])
 plt.show()
-
-smoothened = np.reshape(smoothened,(-1,1))
-
+smoothened = np.reshape(smoothened, (-1, 1))
 
 outputter(smoothened)

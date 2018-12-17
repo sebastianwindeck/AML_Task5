@@ -2,31 +2,28 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.ensemble import VotingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
-from helpers.io import outputter
-from helpers.plotter import plot_confusion_matrix
-from helpers.preprocessing import movingaverage
 from joblib import dump
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
-from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
+from sklearn.neural_network import MLPClassifier
+from sklearn.pipeline import Pipeline
 
-eeg1 = np.load(os.getcwd() + '/data/numpy/data_eeg1.npy')
-eeg2 = np.load(os.getcwd() + '/data/numpy/data_eeg2.npy')
-emg = np.load(os.getcwd() + '/data/numpy/data_emg.npy')
-lab = np.load(os.getcwd() + '/data/numpy/labels.npy')
+from helpers.io import outputter, inputter_train
+from helpers.plotter import plot_confusion_matrix
+from helpers.preprocessing import movingaverage
+
+eeg1, eeg2, emg, lab = inputter_train()
 
 '''Reshape data set'''
 
 print(eeg1.shape)
 data = np.concatenate((np.reshape(eeg1, (-1, 128)), np.reshape(eeg2, (-1, 128)), np.reshape(emg, (-1, 128))), axis=1)
 print("Data format: ", data.shape)
+
+del eeg1
+del eeg2
+del emg
 
 print(lab.shape)
 labels = np.reshape(lab, (-1, 1))
@@ -42,33 +39,32 @@ X = data
 y = labels
 
 '''Create model'''
-
-clf = SVC(kernel='rbf', C=1, gamma='auto')
-
+clf = MLPClassifier(solver='lbfgs', alpha=1e-3,
+                    hidden_layer_sizes=(500, 3), random_state=1)
 '''Feature selection'''
 f_select = SelectKBest(f_classif, k=200)
 
 '''pipe'''
 pipeline = Pipeline([
     ('f_select', f_select),
-    ('SVC', clf)
+    ('GNB', clf)
 ])
 
 '''parameters for Gsearch'''
 parameters = {
-    'f_select__k': [150, 250],
+    'f_select__k': [100],
     # 'SVC__degree' : [2,5,8],
     # höher -> 1000
-    'SVC__C': [0.1, 1, 10]
+    # 'SVC__C': [0.1, 1, 10]
 }
 
 '''Gridsearch'''
-CV = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy', n_jobs=-1, cv=8, verbose=2)
+CV = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy', n_jobs=1, cv=8, verbose=2)
 
 '''Fit model'''
-clf = CV.fit(X, np.ravel(y))
-
-dump(clf, os.getcwd() + '/model/rbf1.joblib')
+clf.fit(X, np.ravel(y))
+# clf = CV.best_estimator_
+dump(clf, os.getcwd() + '/model/ann200.joblib')
 print('Fitted.')
 
 y_pred = clf.predict(X)
@@ -76,15 +72,9 @@ print(y_pred)
 print('Predicted.')
 print('')
 print('--- Confusion matrix ---')
-print(np.ravel(y))
-print(y_pred)
 
 classes = np.unique(y)
 plot_confusion_matrix(classes, y_true=y, y_pred=y_pred)
-
-del eeg1
-del eeg2
-del emg
 
 '''Predict test set'''
 

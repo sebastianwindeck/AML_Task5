@@ -55,3 +55,29 @@ def plot_confusion_matrix(classes, y_true, y_pred):
     plt.figure()
     _plot_confusion_matrix(cnf_matrix, classes=classes, normalize=True,
                           title='Normalized confusion matrix')
+
+
+def plotter_input(data, labels):
+
+    nr = 3
+    nc = 3
+    fig = plt.figure()
+    j = 0
+    for i in (0, 1, 2):
+        ind = np.where(labels == i)
+        ind = ind[0]
+        print(ind.shape)
+        for k in (0, 1, 2):
+            ctr = j + 1
+            print(ctr)
+            ax = fig.add_subplot(nr, nc, ctr)
+            data_p = data[ind[0], k * 128:(k + 1) * 128]
+            ax.plot(data_p, color='b', alpha=0.2)
+            data_p = data[ind[1], k * 128:(k + 1) * 128]
+            ax.plot(data_p, color='b', alpha=0.2)
+            data_p = data[ind[2], k * 128:(k + 1) * 128]
+            ax.plot(data_p, color='b', alpha=0.2)
+            ax.set_title(label=('Class: ', i, ' Type: ', k))
+            j = j + 1
+
+    plt.show()
